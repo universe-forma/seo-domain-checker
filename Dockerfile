@@ -39,7 +39,8 @@ RUN mkdir -p /app/data /app/logs && \
 
 # Create a non-root user to run the application
 RUN useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
+    chown -R appuser:appuser /app && \
+    chmod -R 775 /app/data /app/logs
 
 # Switch to non-root user
 USER appuser

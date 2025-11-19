@@ -7,8 +7,15 @@ import os
 import sqlite3
 import sys
 
-DB_PATH = "/app/ahrefs_data.db"
+# Use environment variable if set (for Docker), otherwise use default
+DB_PATH = os.environ.get("DB_PATH", "/app/ahrefs_data.db")
 SCHEMA_PATH = "/app/ddl/001-initial-schema.sql"
+
+# Ensure the database directory exists
+db_dir = os.path.dirname(DB_PATH)
+if db_dir and not os.path.exists(db_dir):
+    os.makedirs(db_dir, exist_ok=True)
+    print(f"📁 Created database directory: {db_dir}")
 
 def init_database():
     """Initialize database with schema if tables don't exist"""

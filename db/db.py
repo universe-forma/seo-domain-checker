@@ -14,8 +14,9 @@ class LinkDirection(str, Enum):
     OUT = "out"
 
 
+# Use environment variable if set (for Docker), otherwise use default
 project_root = os.path.abspath(os.getcwd())
-DB_PATH = os.path.join(project_root, "ahrefs_data.db")
+DB_PATH = os.environ.get("DB_PATH", os.path.join(project_root, "ahrefs_data.db"))
 
 _thread_local = threading.local()
 _db_initialized = False

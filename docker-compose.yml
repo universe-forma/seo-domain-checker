@@ -13,11 +13,12 @@ services:
       # API Keys - Set these in .env file
       - AHREFS_API_TOKEN=${AHREFS_API_TOKEN}
       - SIMILAR_WEB_KEY=${SIMILAR_WEB_KEY}
+      # Database path in container
+      - DB_PATH=/app/data/ahrefs_data.db
     volumes:
       # Persist database and logs
       - ./data:/app/data
       - ./logs:/app/logs
-      - ./ahrefs_data.db:/app/ahrefs_data.db:rw
     restart: unless-stopped
     networks:
       - seo-network
