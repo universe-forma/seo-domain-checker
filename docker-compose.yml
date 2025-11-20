@@ -34,7 +34,6 @@ services:
       # Persist database and logs (for SQLite)
       - ./data:/app/data
       - ./logs:/app/logs
-      - ./ahrefs_data.db:/app/ahrefs_data.db:rw
     restart: unless-stopped
     networks:
       - seo-network
