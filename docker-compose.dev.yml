@@ -1,0 +1,71 @@
+version: "3.8"
+
+# Local Development Setup with PostgreSQL
+# Usage: docker-compose -f docker-compose.dev.yml up -d
+
+services:
+  # PostgreSQL Database
+  postgres:
+    container_name: seo_postgres
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME:-seo_checker}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    networks:
+      - seo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: seo-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      # API Keys
+      - AHREFS_API_TOKEN=${AHREFS_API_TOKEN}
+      - SIMILAR_WEB_KEY=${SIMILAR_WEB_KEY}
+      # Database Configuration
+      - DB_TYPE=postgresql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-seo_checker}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+    volumes:
+      # Mount logs for debugging
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - seo-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  seo-network:
+    driver: bridge
+

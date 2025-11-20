@@ -1,5 +1,8 @@
 version: "3.8"
 
+# Simple deployment with SQLite (default)
+# For PostgreSQL, use: docker-compose -f docker-compose.dev.yml up -d
+
 services:
   # Backend API Service
   backend:
@@ -13,8 +16,22 @@ services:
       # API Keys - Set these in .env file
       - AHREFS_API_TOKEN=${AHREFS_API_TOKEN}
       - SIMILAR_WEB_KEY=${SIMILAR_WEB_KEY}
+      # Database Configuration (SQLite by default)
+      - DB_TYPE=${DB_TYPE:-sqlite}
+      - SQLITE_DB_PATH=/app/ahrefs_data.db
+      # PostgreSQL settings (supports both POSTGRES_* and DB_* variables)
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-seo_checker}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
     volumes:
-      # Persist database and logs
+      # Persist database and logs (for SQLite)
       - ./data:/app/data
       - ./logs:/app/logs
       - ./ahrefs_data.db:/app/ahrefs_data.db:rw
